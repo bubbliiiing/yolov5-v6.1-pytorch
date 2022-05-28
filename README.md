@@ -1,4 +1,4 @@
-## YOLOV5：You Only Look Once目标检测模型在pytorch当中的实现（edition v5.0 in Ultralytics）
+## YOLOV5：You Only Look Once目标检测模型在pytorch当中的实现（edition v6.1 in Ultralytics）
 ---
 
 ## 目录
@@ -13,10 +13,7 @@
 9. [参考资料 Reference](#Reference)
 
 ## Top News
-**`2022-04`**:**支持多GPU训练，新增各个种类目标数量计算，新增heatmap；将正样本匹配过程加入dataloader，加快了运算速度；加入EMA效果变好。**  
-BiliBili视频中的原仓库地址为：https://github.com/bubbliiiing/yolov5-pytorch/tree/bilibili
-
-**`2022-02`**:**仓库创建，支持不同尺寸模型训练，分别为s、m、l、x版本的yolov5、支持step、cos学习率下降法、支持adam、sgd优化器选择、支持学习率根据batch_size自适应调整、新增图片裁剪。**  
+**`2022-05`**:**仓库创建，支持不同尺寸模型训练，分别为n、s、m、l、x版本的yolov5、支持step、cos学习率下降法、支持adam、sgd优化器选择、支持学习率根据batch_size自适应调整、新增图片裁剪、支持多GPU训练、支持各个种类目标数量计算、支持heatmap、支持EMA。**  
 
 ## 相关仓库
 | 模型 | 路径 |
@@ -26,24 +23,27 @@ Efficientnet-Yolo3 | https://github.com/bubbliiiing/efficientnet-yolo3-pytorch
 YoloV4 | https://github.com/bubbliiiing/yolov4-pytorch
 YoloV4-tiny | https://github.com/bubbliiiing/yolov4-tiny-pytorch
 Mobilenet-Yolov4 | https://github.com/bubbliiiing/mobilenet-yolov4-pytorch
-YoloV5 | https://github.com/bubbliiiing/yolov5-pytorch
+YoloV5-V5.0 | https://github.com/bubbliiiing/yolov5-pytorch
+YoloV5-V6.1 | https://github.com/bubbliiiing/yolov5-v6.1-pytorch
 YoloX | https://github.com/bubbliiiing/yolox-pytorch
 
 ## 性能情况
 | 训练数据集 | 权值文件名称 | 测试数据集 | 输入图片大小 | mAP 0.5:0.95 | mAP 0.5 |
 | :-----: | :-----: | :------: | :------: | :------: | :-----: |
-| COCO-Train2017 | [yolov5_s.pth](https://github.com/bubbliiiing/yolov5-pytorch/releases/download/v1.0/yolov5_s.pth) | COCO-Val2017 | 640x640 | 35.6 | 53.9
-| COCO-Train2017 | [yolov5_m.pth](https://github.com/bubbliiiing/yolov5-pytorch/releases/download/v1.0/yolov5_m.pth) | COCO-Val2017 | 640x640 | 43.9 | 62.6 
-| COCO-Train2017 | [yolov5_l.pth](https://github.com/bubbliiiing/yolov5-pytorch/releases/download/v1.0/yolov5_l.pth) | COCO-Val2017 | 640x640 | 47.4 | 66.2 
-| COCO-Train2017 | [yolov5_x.pth](https://github.com/bubbliiiing/yolov5-pytorch/releases/download/v1.0/yolov5_x.pth) | COCO-Val2017 | 640x640 | 49.4 | 67.9 
+| COCO-Train2017 | [yolov5_n_v6.1.pth](https://github.com/bubbliiiing/yolov5-v6.1-pytorch/releases/download/v1.0/yolov5_n_v6.1.pth) | COCO-Val2017 | 640x640 | 27.6 | 45.0
+| COCO-Train2017 | [yolov5_s_v6.1.pth](https://github.com/bubbliiiing/yolov5-v6.1-pytorch/releases/download/v1.0/yolov5_s_v6.1.pth) | COCO-Val2017 | 640x640 | 37.0 | 56.2
+| COCO-Train2017 | [yolov5_m_v6.1.pth](https://github.com/bubbliiiing/yolov5-v6.1-pytorch/releases/download/v1.0/yolov5_m_v6.1.pth) | COCO-Val2017 | 640x640 | 44.7 | 63.4 
+| COCO-Train2017 | [yolov5_l_v6.1.pth](https://github.com/bubbliiiing/yolov5-v6.1-pytorch/releases/download/v1.0/yolov5_l_v6.1.pth) | COCO-Val2017 | 640x640 | 48.4 | 66.6 
+| COCO-Train2017 | [yolov5_x_v6.1.pth](https://github.com/bubbliiiing/yolov5-v6.1-pytorch/releases/download/v1.0/yolov5_x_v6.1.pth) | COCO-Val2017 | 640x640 | 50.1 | 68.3 
 
 ## 所需环境
 torch==1.2.0
+为了使用amp混合精度，推荐使用torch1.7.1以上的版本。
 
 ## 文件下载
 训练所需的权值可在百度网盘中下载。  
-链接: https://pan.baidu.com/s/1gPDsDVX1lbcSNqCKsvzz0A   
-提取码: 3mjs   
+链接: https://pan.baidu.com/s/1oNl_9Bp6jjYFbGLnELbcjQ    
+提取码: 2dr9    
 
 VOC数据集下载地址如下，里面已经包括了训练集、测试集、验证集（与测试集一样），无需再次划分：  
 链接: https://pan.baidu.com/s/19Mw2u_df_nBzsC2lg20fQA    
@@ -115,7 +115,7 @@ _defaults = {
     #   验证集损失较低不代表mAP较高，仅代表该权值在验证集上泛化性能较好。
     #   如果出现shape不匹配，同时要注意训练时的model_path和classes_path参数的修改
     #--------------------------------------------------------------------------#
-    "model_path"        : 'model_data/yolov5_s.pth',
+    "model_path"        : 'model_data/yolov5_s_v6.1.pth',
     "classes_path"      : 'model_data/coco_classes.txt',
     #---------------------------------------------------------------------#
     #   anchors_path代表先验框对应的txt文件，一般不修改。

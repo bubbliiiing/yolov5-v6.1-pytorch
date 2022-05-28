@@ -24,7 +24,7 @@ class Conv(nn.Module):
     def forward(self, x):
         return self.act(self.bn(self.conv(x)))
 
-    def fuseforward(self, x):
+    def forward_fuse(self, x):
         return self.act(self.conv(x))
 
 class Bottleneck(nn.Module):
@@ -85,7 +85,7 @@ class CSPDarknet(nn.Module):
 
         #-----------------------------------------------#
         #   利用focus网络结构进行特征提取
-        #   640, 640, 3 -> 320, 320, 12 -> 320, 320, 64
+        #   640, 640, 3 -> 320, 320, 64
         #-----------------------------------------------#
         self.stem       = Conv(3, base_channels, 6, 2, 2)
         
@@ -129,16 +129,17 @@ class CSPDarknet(nn.Module):
         #-----------------------------------------------#
         self.dark5 = nn.Sequential(
             Conv(base_channels * 8, base_channels * 16, 3, 2),
-            C3(base_channels * 16, base_channels * 16, base_depth, shortcut=False),
+            C3(base_channels * 16, base_channels * 16, base_depth),
             SPPF(base_channels * 16, base_channels * 16),
         )
         if pretrained:
             backbone = "cspdarknet_" + phi
             url = {
-                "cspdarknet_s" : 'https://github.com/bubbliiiing/yolov5-pytorch/releases/download/v1.0/cspdarknet_s_v6.1_backbone.pth',
-                'cspdarknet_m' : 'https://github.com/bubbliiiing/yolov5-pytorch/releases/download/v1.0/cspdarknet_m_v6.1_backbone.pth',
-                'cspdarknet_l' : 'https://github.com/bubbliiiing/yolov5-pytorch/releases/download/v1.0/cspdarknet_l_v6.1_backbone.pth',
-                'cspdarknet_x' : 'https://github.com/bubbliiiing/yolov5-pytorch/releases/download/v1.0/cspdarknet_x_v6.1_backbone.pth',
+                "cspdarknet_n" : 'https://github.com/bubbliiiing/yolov5-v6.1-pytorch/releases/download/v1.0/cspdarknet_n_v6.1_backbone.pth',
+                "cspdarknet_s" : 'https://github.com/bubbliiiing/yolov5-v6.1-pytorch/releases/download/v1.0/cspdarknet_s_v6.1_backbone.pth',
+                'cspdarknet_m' : 'https://github.com/bubbliiiing/yolov5-v6.1-pytorch/releases/download/v1.0/cspdarknet_m_v6.1_backbone.pth',
+                'cspdarknet_l' : 'https://github.com/bubbliiiing/yolov5-v6.1-pytorch/releases/download/v1.0/cspdarknet_l_v6.1_backbone.pth',
+                'cspdarknet_x' : 'https://github.com/bubbliiiing/yolov5-v6.1-pytorch/releases/download/v1.0/cspdarknet_x_v6.1_backbone.pth',
             }[backbone]
             checkpoint = torch.hub.load_state_dict_from_url(url=url, map_location="cpu", model_dir="./model_data")
             self.load_state_dict(checkpoint, strict=False)
