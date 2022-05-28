@@ -37,7 +37,7 @@ YoloX | https://github.com/bubbliiiing/yolox-pytorch
 | COCO-Train2017 | [yolov5_x_v6.1.pth](https://github.com/bubbliiiing/yolov5-v6.1-pytorch/releases/download/v1.0/yolov5_x_v6.1.pth) | COCO-Val2017 | 640x640 | 50.1 | 68.3 
 
 ## 所需环境
-torch==1.2.0
+torch==1.2.0    
 为了使用amp混合精度，推荐使用torch1.7.1以上的版本。
 
 ## 文件下载
